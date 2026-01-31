@@ -75,4 +75,66 @@ class LecturerController extends Controller
 
         return view('lecturer.student-list', compact('section', 'registrations'));
     }
+
+    public function showGradeEntry($section_id)
+    {
+        $user = Auth::user();
+        $lecturer = Lecturer::where('user_id', $user->id)->first();
+
+        if (!$lecturer) {
+            abort(403, 'Lecturer profile not found.');
+        }
+        
+        // Verify this section belongs to the lecturer
+        $section = CourseSection::with(['course', 'semester'])
+            ->where('section_id', $section_id)
+            ->where('lecturer_id', $lecturer->lecturer_id)
+            ->firstOrFail();
+        
+        // Get students with their current grades
+        $students = Registration::with(['student'])
+            ->where('section_id', $section_id)
+            ->where('status', 'approved')
+            ->orderBy('student_id')
+            ->get();
+        
+        return view('lecturer.grade-entry', compact('section', 'students'));
+    }
+
+    public function updateGrades(Request $request, $section_id)
+    {
+        $user = Auth::user();
+        $lecturer = Lecturer::where('user_id', $user->id)->first();
+
+        if (!$lecturer) {
+            abort(403, 'Lecturer profile not found.');
+        }
+        
+        // Verify this section belongs to the lecturer
+        $section = CourseSection::where('section_id', $section_id)
+            ->where('lecturer_id', $lecturer->lecturer_id)
+            ->firstOrFail();
+        
+        // Validate grades
+        $request->validate([
+            'grades' => 'required|array',
+            'grades.*' => 'nullable|in:A,A-,B+,B,B-,C+,C,C-,D+,D,F',
+        ]);
+        
+        // Update grades for each student
+        $updatedCount = 0;
+        foreach ($request->grades as $registrationId => $grade) {
+            $updated = Registration::where('registration_id', $registrationId)
+                ->where('section_id', $section_id)
+                ->update(['grade' => $grade ?: null]); // Set to null if empty
+            
+            if ($updated) {
+                $updatedCount++;
+            }
+        }
+        
+        return redirect()
+            ->route('lecturer.section.grade-entry', $section_id)
+            ->with('success', "Grades updated successfully for {$updatedCount} student(s)!");
+    }
 }

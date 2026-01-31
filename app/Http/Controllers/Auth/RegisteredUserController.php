@@ -31,40 +31,55 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:student,lecturer'],
-        ]);
+                    'name' => ['required', 'string', 'max:255'],
+                    'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+                    'password' => [
+                        'required', 
+                        'confirmed',  // ✅ This ensures password_confirmation field matches
+                        Rules\Password::defaults()
+                            ->min(8)              // Minimum 8 characters
+                            ->letters()           // Must contain letters
+                            ->mixedCase()         // Must contain both upper and lower case
+                            ->numbers()           // Must contain numbers
+                            ->symbols()           // Must contain symbols
+                            ->uncompromised(),    // Must not be in data breaches
+                    ],
+                    'role' => ['required', 'string', 'in:student,lecturer'],
+                ], [
+                    'password.confirmed' => 'The password confirmation does not match.',
+                    'password.min' => 'Password must be at least 8 characters.',
+                    'password.mixed_case' => 'Password must contain both uppercase and lowercase letters.',
+                    'password.numbers' => 'Password must contain at least one number.',
+                    'password.symbols' => 'Password must contain at least one symbol.',
+                ]);    
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'status' => 'active',
-        ]);
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password), // Password hashing
+                    'role' => $request->role,
+                    'status' => 'pending', // Changed to pending until email verified
+                ]);
 
-        if ($user->role === 'student') {
-            Student::create([
-                'student_id' => 'S' . str_pad($user->id, 4, '0', STR_PAD_LEFT),
-                'user_id' => $user->id,
-                'name' => $user->name,
-            ]);
-        }
+                // Create student profile if role is student
+                if ($user->role === 'student') {
+                    Student::create([
+                        'student_id' => 'S' . str_pad($user->id, 4, '0', STR_PAD_LEFT),
+                        'user_id' => $user->id,
+                        'name' => $user->name,
+                    ]);
+                }
 
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+                // ✅ FUNCTION b) Trigger email verification
+                event(new Registered($user));
 
-        event(new Registered($user));
+                // Don't log in user yet - they need to verify email first
+                // Auth::login($user); // Commented out - user must verify email
 
-        Auth::login($user);
-
-        return match ($user->role) {
-            'student'  => redirect()->route('student.profile.edit'),
-            'lecturer' => redirect()->route('lecturer.dashboard'),
-            default    => redirect('/'),
-        };
+                // Redirect to email verification notice
+                return redirect()->route('verification.notice')
+                    ->with('success', 'Registration successful! Please check your email to verify your account.');
     }
 }
+    
+

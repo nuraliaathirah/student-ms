@@ -44,7 +44,7 @@
             padding: 20px;
         }
 
-        .login-container { width: 100%; max-width: 420px; }
+        .login-container { width: 100%; max-width: 480px; }
 
         .login-card {
             background-color: #fff;
@@ -167,17 +167,65 @@
         .alert {
             padding: 1rem;
             margin-bottom: 1rem;
-            background-color: #f7dddc;
-            border: 1px solid #f0bab9;
-            color: #572120;
+            border: 1px solid;
             font-size: 0.875rem;
             display: none;
         }
 
         .alert.show { display: block; }
 
+        .alert-danger {
+            background-color: #f7dddc;
+            border-color: #f0bab9;
+            color: #572120;
+        }
+
+        .alert-info {
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+            color: #31708f;
+        }
+
+        /* ✅ Password Requirements Info Box */
+        .requirements-box {
+            background-color: #e8f4fd;
+            border: 1px solid #b8daff;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.8125rem;
+        }
+
+        .requirements-box .title {
+            font-weight: 600;
+            color: #004085;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .requirements-box ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: #004085;
+        }
+
+        .requirements-box li {
+            margin-bottom: 0.25rem;
+        }
+
+        .helper-text {
+            font-size: 0.75rem;
+            color: #919aa1;
+            margin-top: 0.25rem;
+        }
+
+        .form-control.error {
+            border-color: #d9534f;
+        }
+
         @media (max-width: 576px) {
             .login-card { padding: 2rem 1.5rem; }
+            .login-container { max-width: 100%; }
         }
     </style>
 </head>
@@ -189,24 +237,32 @@
                 <p>Sign up to get started</p>
             </div>
 
-           
-            <div id="errorAlert" class="alert {{ $errors->any() ? 'show' : '' }}">
+            {{-- Error Alert --}}
+            <div id="errorAlert" class="alert alert-danger {{ $errors->any() ? 'show' : '' }}">
                 @if ($errors->any())
-                    {{ $errors->first() }}
+                    <ul style="margin: 0; padding-left: 1.25rem;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 @else
                     Please check your input.
                 @endif
             </div>
 
-            
+            {{-- Registration Form --}}
             <form id="registerForm" method="POST" action="{{ route('register') }}">
                 @csrf
 
+                {{-- Hidden role field - defaults to student --}}
+                <input type="hidden" name="role" value="student">
+
+                {{-- Full Name --}}
                 <div class="form-group">
                     <label for="name" class="form-label">Full Name</label>
                     <input
                         type="text"
-                        class="form-control"
+                        class="form-control {{ $errors->has('name') ? 'error' : '' }}"
                         id="name"
                         name="name"
                         value="{{ old('name') }}"
@@ -217,11 +273,12 @@
                     >
                 </div>
 
+                {{-- Email Address --}}
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
                     <input
                         type="email"
-                        class="form-control"
+                        class="form-control {{ $errors->has('email') ? 'error' : '' }}"
                         id="email"
                         name="email"
                         value="{{ old('email') }}"
@@ -231,35 +288,53 @@
                     >
                 </div>
 
+                {{-- ✅ FUNCTION e) Password Requirements Info --}}
+                <div class="requirements-box">
+                    <div class="title">✅ Password Requirements:</div>
+                    <ul>
+                        <li>At least 8 characters long</li>
+                        <li>Contains uppercase and lowercase letters</li>
+                        <li>Contains at least one number</li>
+                        <li>Contains at least one symbol (!@#$%^&*)</li>
+                    </ul>
+                </div>
+
+                {{-- ✅ FUNCTION e) Password (First Field) --}}
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
                     <input
                         type="password"
-                        class="form-control"
+                        class="form-control {{ $errors->has('password') ? 'error' : '' }}"
                         id="password"
                         name="password"
-                        placeholder="Create a password"
+                        placeholder="Create a strong password"
                         required
                         autocomplete="new-password"
                     >
                 </div>
 
-                
+                {{-- ✅ FUNCTION e) Confirm Password (Second Field - Double Check) --}}
                 <div class="form-group">
                     <label for="password_confirmation" class="form-label">Confirm Password</label>
                     <input
                         type="password"
-                        class="form-control"
+                        class="form-control {{ $errors->has('password_confirmation') ? 'error' : '' }}"
                         id="password_confirmation"
                         name="password_confirmation"
                         placeholder="Re-enter your password"
                         required
                         autocomplete="new-password"
                     >
+                    <div class="helper-text">⚠️ Please re-enter your password to confirm</div>
                 </div>
 
                 <button type="submit" class="btn mt-3">Sign Up</button>
             </form>
+
+            {{-- ✅ FUNCTION b) Email Verification Notice --}}
+            <div class="alert alert-info show" style="margin-top: 1rem;">
+                By registering, you will receive an email verification link. Please verify your email to activate your account.
+            </div>
 
             <div class="divider">
                 <span>Already have an account?</span>
@@ -275,7 +350,24 @@
         const errorAlert = document.getElementById('errorAlert');
         ['name','email','password','password_confirmation'].forEach((id) => {
             const el = document.getElementById(id);
-            if (el) el.addEventListener('input', () => errorAlert.classList.remove('show'));
+            if (el) {
+                el.addEventListener('input', () => {
+                    errorAlert.classList.remove('show');
+                    el.classList.remove('error');
+                });
+            }
+        });
+
+        // ✅ Client-side password match validation
+        const password = document.getElementById('password');
+        const passwordConfirmation = document.getElementById('password_confirmation');
+        
+        passwordConfirmation.addEventListener('input', function() {
+            if (password.value !== passwordConfirmation.value) {
+                passwordConfirmation.style.borderColor = '#d9534f';
+            } else {
+                passwordConfirmation.style.borderColor = '#4bbf73';
+            }
         });
     </script>
 </body>

@@ -10,6 +10,8 @@ class Programme extends Model
     protected $primaryKey = 'program_code';
     public $incrementing = false;
     protected $keyType = 'string';
+    public $timestamps = false;
+    protected $fillable = ['program_code', 'program_name', 'faculty'];
 
     public function courses()
     {

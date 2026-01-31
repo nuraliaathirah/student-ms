@@ -12,153 +12,179 @@
     {{-- Font Awesome --}}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-    {{-- Extra CSS from pages --}}
     <style>
         body {
-        background-color: #f8f9fa;
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;       
-        line-height: 1.5;
-    }
-    h1 { font-size: 1.6rem; font-weight: 600; }
-    h2 { font-size: 1.4rem; font-weight: 600; }
-    h3 { font-size: 1.25rem; font-weight: 600; }
-    h4 { font-size: 1.1rem; font-weight: 600; }
-    h5 { font-size: 1rem; font-weight: 500; }
-    .sidebar {
-      background-color: #212529; 
-      color: #dee2e6; 
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      padding-top: 20px;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-      z-index: 1000;
-      width: 250px;
-      font-size: 0.85rem;
-    }
+            background-color: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;       
+            line-height: 1.5;
+        }
+        h1 { font-size: 1.6rem; font-weight: 600; }
+        h2 { font-size: 1.4rem; font-weight: 600; }
+        h3 { font-size: 1.25rem; font-weight: 600; }
+        h4 { font-size: 1.1rem; font-weight: 600; }
+        h5 { font-size: 1rem; font-weight: 500; }
 
-    .sidebar .nav-link {
-        color: #adb5bd;
-        border-radius: 0.375rem;
-        margin: 5px 15px;
-        padding: 8px 18px;
-        transition: all 0.2s;
-        white-space: nowrap; 
-        overflow: hidden;
-        text-overflow: ellipsis; 
-        
-    }
+        .sidebar {
+            /* Logic for Background Color */
+            @if(auth()->user()->role == 'admin')
+                background-color: #d32f2f;
+            @else
+                background-color: #212529; 
+            @endif
 
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-      background-color: #343a40;
-      color: #fff;
-    }
+            color: #dee2e6; 
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            width: 250px;
+            font-size: 0.85rem;
+        }
 
-    .sidebar .nav-link i {
-      margin-right: 10px;
-      color: #adb5bd;
-    }
+        .sidebar .nav-link {
+            /* Make text white if admin for better contrast on red */
+            color: {{ auth()->user()->role == 'admin' ? '#fff' : '#adb5bd' }};
+            border-radius: 0.375rem;
+            margin: 5px 15px;
+            padding: 8px 18px;
+            transition: all 0.2s;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis; 
+        }
 
-    .sidebar .nav-link:hover i,
-    .sidebar .nav-link.active i {
-      color: #fff;
-    }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            @if(auth()->user()->role == 'admin')
+                background-color: rgba(255, 255, 255, 0.2);
+            @else
+                background-color: #343a40;
+            @endif
+            color: #fff;
+        }
 
-    .sidebar .text-primary {
-      color: #dee2e6 !important;
-    }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            color: {{ auth()->user()->role == 'admin' ? '#fff' : '#adb5bd' }};
+        }
 
-  .main-content {
-    margin-left: 250px;
-    padding: 20px;
-  }
+        .sidebar .nav-link:hover i,
+        .sidebar .nav-link.active i {
+            color: #fff;
+        }
 
-      .dropdown-menu {
-        font-size: 0.85rem;
-        border-radius: 10px;
-    }
+        .sidebar .text-primary {
+            color: #dee2e6 !important;
+        }
 
-    .dropdown-header {
-        font-weight: 600;
-        padding: 10px 16px;
-    }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
 
-    .dropdown-item i {
-        width: 16px;
-    }
+        .dropdown-menu {
+            font-size: 0.85rem;
+            border-radius: 10px;
+        }
 
-    .avatar {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        border: 2px solid white;
+        .dropdown-header {
+            font-weight: 600;
+            padding: 10px 16px;
+        }
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        .dropdown-item i {
+            width: 16px;
+        }
 
-  </style>
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Make avatar icon color match theme */
+            color: {{ auth()->user()->role == 'admin' ? '#d32f2f' : '#212529' }};
+        }
+
+    </style>
     @stack('styles')
 </head>
 
 <body>
     <div class="sidebar d-flex flex-column">
         <div class="text-center mb-4">
-            <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+            {{-- Dynamically change icon based on role --}}
+            @if(auth()->user()->role == 'admin')
+                <i class="fas fa-user-shield fa-3x mb-3 text-white"></i>
+            @else
+                <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+            @endif
             <h5 class="text-light">{{ ucfirst(auth()->user()->role) }} Portal</h5>
         </div>
 
         <ul class="nav flex-column">
             @if(auth()->user()->role == 'student')
-            <li class="nav-item">
-            <a href="{{ route('student.dashboard') }}"
-                class="nav-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-            </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="{{ route('student.record') }}" 
-                class="nav-link {{ request()->routeIs('student.record') ? 'active' : '' }}">
-                    <i class="fas fa-graduation-cap me-2"></i>Academic Record
-                </a>
-            </li>
-
-            <li class="nav-item">
-            <a href="{{ route('student.registration.index') }}"
-                class="nav-link {{ request()->routeIs('student.registration.*') ? 'active' : '' }}">
-                <i class="fas fa-pen me-2"></i>Registration
-            </a>
-            </li>
-
-            <li class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="fas fa-bell me-2"></i>Notifications
-            </a>
-            </li>
+                <li class="nav-item">
+                    <a href="{{ route('student.dashboard') }}" class="nav-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('student.record') }}" class="nav-link {{ request()->routeIs('student.record') ? 'active' : '' }}">
+                        <i class="fas fa-graduation-cap me-2"></i>Academic Record
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('student.registration.index') }}" class="nav-link {{ request()->routeIs('student.registration.*') ? 'active' : '' }}">
+                        <i class="fas fa-pen me-2"></i>Registration
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-bell me-2"></i>Notifications
+                    </a>
+                </li>
             @endif
 
             @if(auth()->user()->role == 'lecturer')
-            <li class="nav-item">
-                <a href="{{ route('lecturer.dashboard') }}" class="nav-link {{ request()->routeIs('lecturer.dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-chalkboard-teacher me-2"></i>Dashboard
-                </a>
-            </li>
+                <li class="nav-item">
+                    <a href="{{ route('lecturer.dashboard') }}" class="nav-link {{ request()->routeIs('lecturer.dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('lecturer.dashboard') }}" class="nav-link {{ request()->routeIs('lecturer.section.*') ? 'active' : '' }}">
+                        <i class="fas fa-pen-to-square me-2"></i>Grade Entry
+                    </a>
+                </li>
+            @endif
+
+            @if(auth()->user()->role == 'admin')
+                <li class="nav-item">
+                    <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.courses.index') }}" class="nav-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
+                        <i class="fas fa-book me-2"></i>Manage Courses
+                    </a>
+                </li>
             @endif
 
             <li class="nav-item mt-auto">
-
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                @csrf
-            </form>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
             </li>
         </ul>
-        </div>
-
+    </div>
 
     <div class="main-content">
         <div class="d-flex align-items-center mb-4">
@@ -170,11 +196,8 @@
                     <small class="text-muted">{{ ucfirst(auth()->user()->role) }}</small>
                 </div>        
                 <div class="dropdown">
-                    <div class="avatar dropdown-toggle"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="fas fa-user-graduate"></i>
+                    <div class="avatar dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas {{ auth()->user()->role == 'admin' ? 'fa-user-tie' : 'fa-user-graduate' }}"></i>
                     </div>
 
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm">
@@ -183,25 +206,19 @@
                             <br>
                             <small class="text-muted">{{ ucfirst(auth()->user()->role) }}</small>
                         </li>
-
                         <li><hr class="dropdown-divider"></li>
-
                         <li>
-                            <a class="dropdown-item" href="{{ route(auth()->user()->role . '.profile.edit') }}">
-                                <i class="fas fa-user-edit me-2"></i>Edit Profile
+                            @if(in_array(auth()->user()->role, ['lecturer', 'student']))
+                                <a class="dropdown-item" href="{{ route(auth()->user()->role . '.profile.edit') }}">
+                                    <i class="fas fa-user-edit me-2"></i>Edit Profile
+                                </a>
+                            @endif                        
+                        </li>
+                        <li>
+                            <a href="{{ route('logout') }}" class="dropdown-item text-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
                             </a>
                         </li>
-
-                        <li>
-                        <a href="{{ route('logout') }}"
-                            class="dropdown-item text-danger"
-                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </a>
-                        </li>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                        @csrf
-                        </form>
                     </ul>
                 </div>
             </div>
@@ -210,8 +227,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    {{-- Extra JS from pages --}}
     @stack('scripts')
 </body>
 </html>

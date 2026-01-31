@@ -15,8 +15,9 @@ return new class extends Migration
             $table->string('semester_id', 20)->primary();
             $table->string('year', 9);
             $table->integer('session');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->boolean('is_current')->default(false);
             $table->timestamps();
         });
     }

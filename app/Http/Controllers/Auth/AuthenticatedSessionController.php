@@ -21,6 +21,7 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Handle an incoming authentication request.
+     * 
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -29,9 +30,29 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = $request->user();
-        $role = $user->role; 
+        $role = $user->role;
 
-        
+        if (!$user->hasVerifiedEmail()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return back()->withErrors([
+                'email' => 'Please verify your email address before logging in. Check your inbox for the verification link.',
+            ])->withInput($request->only('email'));
+        }
+
+        // Check if account is active
+        if ($user->status !== 'active') {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return back()->withErrors([
+                'email' => 'Your account is not active. Please contact the administrator.',
+            ])->withInput($request->only('email'));
+        }
+
         return redirect(match ($role) {
             'student'  => route('student.dashboard'),
             'lecturer' => route('lecturer.dashboard'),

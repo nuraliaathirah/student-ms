@@ -6,7 +6,7 @@
 <style>
   .page-wrap { width: 100%; max-width: 980px; margin: 0 auto; }
   .page-banner {
-    background: linear-gradient(135deg, #1e3c72, #2a5298); /* Different blue for Lecturer */
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
     color: white; border-radius: 15px; padding: 30px; margin-bottom: 30px;
   }
   .stat-card {
@@ -17,11 +17,27 @@
   }
   .stat-card:hover { transform: translateY(-3px); }
   .course-badge { background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
+  .action-btn-group .btn {
+    font-size: 0.7rem;
+    padding: 5px 8px;
+    white-space: nowrap;
+  }
+  .action-btn-group .btn i {
+    font-size: 0.65rem;
+  }
 </style>
 @endpush
 
 @section('content')
 <div class="page-wrap">
+
+    {{-- Success Message --}}
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
 
     {{-- Banner --}}
     <div class="page-banner d-flex justify-content-between align-items-center">
@@ -66,11 +82,21 @@
                 <h6 class="fw-bold mb-1">{{ $section->course->course_name }}</h6>
                 <p class="text-muted small mb-3">Section {{ $section->section_no }} • {{ $section->schedule ?? 'TBA' }}</p>
 
-                <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
-                    <small class="text-muted">{{ $section->venue ?? 'Venue TBA' }}</small>
-                    <a href="{{ route('lecturer.section.students', $section->section_id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                        View Student List
-                    </a>
+                <div class="mt-auto pt-3 border-top">
+                    <small class="text-muted d-block mb-2"><i class="fas fa-map-marker-alt me-1"></i>{{ $section->venue ?? 'Venue TBA' }}</small>
+                    
+                    <div class="action-btn-group d-flex gap-1">
+                        <a href="{{ route('lecturer.section.students', $section->section_id) }}" 
+                           class="btn btn-sm btn-outline-primary rounded-pill flex-fill" 
+                           title="View Student List">
+                            <i class="fas fa-list me-1"></i>Students
+                        </a>
+                        <a href="{{ route('lecturer.section.grade-entry', $section->section_id) }}" 
+                           class="btn btn-sm btn-outline-success rounded-pill flex-fill"
+                           title="Enter Grades">
+                            <i class="fas fa-pen-to-square me-1"></i>Grades
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

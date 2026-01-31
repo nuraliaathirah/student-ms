@@ -26,6 +26,11 @@ class ProgrammeSeeder extends Seeder
                 'faculty' => 'Faculty of Computing',
             ],
             [
+                'program_code' => 'SECJH',
+                'program_name' => 'Software Engineering with Honours',
+                'faculty' => 'Faculty of Computing',
+            ],
+            [
                 'program_code' => 'SECBH',
                 'program_name' => 'Bioinformatics',
                 'faculty' => 'Faculty of Computing',

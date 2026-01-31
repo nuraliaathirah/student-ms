@@ -6,6 +6,22 @@
 <style>
   .page-wrap { width: 100%; max-width: 980px; margin: 0 auto; }
   .avatar-sm { width: 32px; height: 32px; background: #e9ecef; border-radius: 50%; display:flex; align-items:center; justify-content:center; color: #495057; font-size: 0.8rem; }
+  
+  /* New Pill Button Style */
+  .btn-pill {
+      border-radius: 50px !important;
+      padding: 0.25rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.2s;
+  }
+  
+  .btn-pill:hover {
+      background-color: #f8f9fa;
+      border-color: #0d6efd !important;
+      color: #0d6efd !important;
+      transform: translateY(-1px);
+  }
 </style>
 @endpush
 
@@ -30,7 +46,7 @@
                         <th>Name</th>
                         <th>Matric No</th>
                         <th>Programme</th>
-                        <th class="text-end pe-4">Action</th>
+                        <th class="text-end pe-4 text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,8 +63,9 @@
                         </td>
                         <td>{{ $reg->student->matric_no }}</td>
                         <td><span class="badge bg-light text-dark border">{{ $reg->student->program_code }}</span></td>
-                        <td class="text-end pe-4">
-                            <button class="btn btn-sm btn-light border" 
+                        <td class="text-end pe-4 text-center">
+                            {{-- Adjusted Button: Added btn-pill class --}}
+                            <button class="btn btn-pill btn-light border " 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#studentModal"
                                     data-name="{{ $reg->student->name }}"
@@ -56,7 +73,7 @@
                                     data-email="{{ $reg->student->user->email ?? '-' }}"
                                     data-phone="{{ $reg->student->phone_no ?? '-' }}"
                                     data-program="{{ $reg->student->program_code }}">
-                                <i class="fas fa-eye text-primary"></i> Details
+                                <i class="fas fa-info-circle text-primary me-1"></i> Details
                             </button>
                         </td>
                     </tr>
@@ -71,6 +88,7 @@
     </div>
 </div>
 
+{{-- (Modal and Scripts stay the same as your original code) --}}
 <div class="modal fade" id="studentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4">

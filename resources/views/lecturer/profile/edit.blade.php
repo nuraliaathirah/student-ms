@@ -16,19 +16,28 @@
     }
     .profile-wrapper .container { max-width: 620px !important; }
 
-    /* Card */
-    .card { border-radius: 12px; border: 1px solid rgba(0,0,0,.1); }
+    /* Card - Adjusted for more radius */
+    .card { border-radius: 20px !important; border: 1px solid rgba(0,0,0,.1); overflow: hidden; }
     .card-header { padding: .65rem .9rem; font-size: .95rem; background-color: #fff; font-weight: 600; }
     .card-body { padding: 1.5rem; }
 
     /* Form Elements */
     .form-label { font-size: .8rem; margin-bottom: .25rem; font-weight: 500; }
-    .form-control, .form-select { font-size: .85rem; padding: .45rem .65rem; }
+    .form-control, .form-select { font-size: .85rem; padding: .45rem .65rem; border-radius: 10px; }
     .text-muted { font-size: .75rem; }
     .mb-3 { margin-bottom: 1rem !important; }
     
-    /* Button */
-    .btn-dark { font-size: .8rem; padding: .5rem 1rem; border-radius: 6px; }
+    /* Button - Adjusted for smaller size and more radius */
+    .btn-dark { 
+        font-size: .75rem;     /* Smaller font */
+        padding: .35rem .8rem; /* Smaller padding */
+        border-radius: 50px;   /* More radius (pill shape) */
+    }
+    .btn-light { 
+        font-size: .75rem;     /* Smaller font */
+        padding: .35rem .8rem; /* Smaller padding */
+        border-radius: 50px;   /* More radius (pill shape) */
+    }
 
     /* Alerts */
     .alert { font-size: .8rem; padding: .5rem .75rem; border-radius: 8px; }
@@ -116,7 +125,7 @@
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
                         <a href="{{ route('lecturer.dashboard') }}" class="btn btn-light border">Cancel</a>
-                        <button type="submit" class="btn btn-dark px-4">Save Changes</button>
+                        <button type="submit" class="btn btn-dark px-4">Save</button>
                     </div>
 
                 </form>

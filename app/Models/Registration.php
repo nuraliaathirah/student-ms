@@ -36,7 +36,7 @@ class Registration extends Model
 
     public function getSemesterAttribute()
     {
-        return $this->section->semester ?? null;
+        return "Session " . $this->section->semester->year . " - Semester " . $this->section->semester->session;
     }
     
     public function getCourseAttribute()

@@ -34,6 +34,11 @@ class User extends Authenticatable
         return $this->hasOne(Lecturer::class, 'user_id');
     }
 
+    public function registrations()
+    {
+        return $this->hasMany(Registration::class, 'student_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
